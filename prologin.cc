@@ -55,6 +55,7 @@ vector<position> sorciers_adv() {
       position p = position(i, j);
       for (int joueur = 1; joueur < 4; joueur ++) {
 	if (nb_sorciers(p, players_ids[joueur])) {
+	//if (joueur_case(p) != moi() && joueur_case(p) != -1) {
 	  positions.push_back(p);
 	  break;
 	}
@@ -99,6 +100,9 @@ bool is_protected(position pos) {
 }
 
 void phase_construction() {
+  if (tour_actuel() == 1) {
+    creer(magie(moi())/COUT_SORCIER);
+  }
   sort(objectives.begin(), objectives.end());
   for (unsigned int i = 0; i < objectives.size(); i++) {
     if (!is_protected(objectives[i].pos)) {
@@ -114,9 +118,37 @@ void phase_deplacement() {
   for (unsigned int i = 0; i < positions.size(); i++) {
     position p1 = positions[i];
     int ns = nb_sorciers_deplacables(p1, moi());
-    if (p1 == base_joueur(moi()))
+    if (p1 == base_joueur(moi())) {
       ns /= 2;
-    deplacer_(p1, p2, ns);
+    }
+    vector<unsigned int> objs;
+    //if (p1 == base_joueur(moi())) {
+      for (unsigned int i = 0; i < objectives.size(); i++) {
+	objs.push_back(i);
+      }
+    /*} else {
+      int dmin = INF;
+      for (unsigned int i = 0; i < objectives.size(); i++) {
+	int d = distance(p1, objectives[i].pos);
+	if (d < dmin) {
+	  dmin = d;
+	  objs.clear();
+	  objs.push_back(i);
+	} else if (d == dmin) {
+	  objs.push_back(i);
+	}
+      }
+    }*/
+    int s = 0;
+    for (unsigned int i = 0; i < objs.size(); i++) {
+      s += objectives[objs[i]].value;
+    }
+    s = objectives[0].value;
+    objs.clear(); objs.push_back(0);
+    for (unsigned int i = 0; i < objs.size(); i++) {
+      deplacer_(p1, objectives[objs[i]].pos, (objectives[objs[i]].value*ns)/s);
+    }
+    //cout << endl;
   }
 }
 
@@ -135,7 +167,10 @@ void phase_tirs() {
   }
   int m = tourelles.size(); 
   for (unsigned int i = 0; i < sadv.size(); i++) {
-    capacites[i+m+1][n-1] = nb_sorciers_adv(sadv[i]);
+    int d = nb_sorciers_adv(sadv[i]);
+    //if (d == 0)
+    //  d = 10; // Tour
+    capacites[i+m+1][n-1] = d;
   }
   for (unsigned int i = 0; i < tourelles.size(); i++) {
     for (unsigned int j = 0; j < sadv.size(); j++) {

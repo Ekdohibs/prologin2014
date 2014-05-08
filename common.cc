@@ -26,7 +26,9 @@ void partie_debut() {
     fontaines[i] = mid(base_joueur(players_ids[i]), 
 		       base_joueur(players_ids[(i+1)%4]));
   }
-  objectives.push_back(objective(artefact, 10));
+  objectives.push_back(objective(artefact, 3));
+  objectives.push_back(objective(fontaines[0], 1));
+  objectives.push_back(objective(fontaines[3], 1));
 }
 
 vector<position> pos_in_range(position pos, int range) {
