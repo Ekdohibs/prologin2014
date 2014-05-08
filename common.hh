@@ -20,7 +20,21 @@ inline position mid(position p1, position p2) {
 extern int players_ids[4];
 extern position fontaines[4];
 extern position artefact;
-extern std::vector<position> objectives;
+
+struct objective {
+  position pos;
+  int value;
+  
+  objective() {};
+  objective(position pos_, int value_):
+    pos(pos_), value(value_) {};
+
+  inline bool operator < (const objective &other) const {
+    return value > other.value;
+  };
+};
+
+extern std::vector<objective> objectives;
 
 void partie_debut();
 std::vector<position> pos_in_range(position pos, int portee);

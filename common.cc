@@ -5,7 +5,7 @@ using namespace std;
 
 int players_ids[4];
 position fontaines[4];
-vector<position> objectives;
+vector<objective> objectives;
 position artefact = position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2);
 
 void partie_debut() {
@@ -26,7 +26,7 @@ void partie_debut() {
     fontaines[i] = mid(base_joueur(players_ids[i]), 
 		       base_joueur(players_ids[(i+1)%4]));
   }
-  objectives.push_back(artefact);
+  objectives.push_back(objective(artefact, 10));
 }
 
 vector<position> pos_in_range(position pos, int range) {

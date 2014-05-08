@@ -63,7 +63,7 @@ vector<position> get_access(position p) {
   return v;
 }
 
-vector<position> safe_chemin(position depart, position arrivee) {
+safe_path safe_chemin(position depart, position arrivee) {
   priority_queue<cle> tas;
   for (int i = 0; i < TAILLE_TERRAIN; i++) {
     for (int j = 0; j < TAILLE_TERRAIN; j++) {
@@ -73,6 +73,7 @@ vector<position> safe_chemin(position depart, position arrivee) {
 
   pres[depart.x][depart.y] = START;
   tas.push(cle(depart, 0, 0));
+  int dang = 0;
   while (!tas.empty()) {
     cle a = tas.top(); tas.pop();
     bool found = false;
@@ -84,6 +85,7 @@ vector<position> safe_chemin(position depart, position arrivee) {
       pres[p.x][p.y] = a.pos;
       if (p == arrivee) {
 	found = true;
+	dang = a.danger + danger[p.x][p.y];
 	break;
       }
       tas.push(cle(p, a.danger + danger[p.x][p.y], a.temps + 1));
@@ -95,7 +97,7 @@ vector<position> safe_chemin(position depart, position arrivee) {
   vector<position> c;
   position v = arrivee;
   if (pres[v.x][v.y] == NONE) {
-    return c;
+    return safe_path(0, c);
   }
   while (pres[v.x][v.y] != START) {
     c.push_back(v);
@@ -107,5 +109,5 @@ vector<position> safe_chemin(position depart, position arrivee) {
     c[i] = c[n-1-i];
     c[n-1-i] = temp;
   }
-  return c;
+  return safe_path(dang, c);
 }

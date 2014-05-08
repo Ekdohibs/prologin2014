@@ -23,14 +23,16 @@ void deplacer_(position depart, position arrivee, int nb) {
   if (nb == 0) {
     return;
   }
-  vector<position> path = safe_chemin(depart, arrivee);
+  safe_path path = safe_chemin(depart, arrivee);
+  if (nb <= path.danger)
+    return;
   //dump_path(path);
   //int d = min((int)path.size(), PORTEE_SORCIER);
-  int d = min((int)path.size(), 1);
+  int d = min((int)path.path.size(), 1);
   if (d == 0) {
     return;
   }
-  deplacer(depart, path[d-1], nb);
+  deplacer(depart, path.path[d-1], nb);
 }
 
 vector<position> sorciers(int joueur) {
@@ -97,9 +99,10 @@ bool is_protected(position pos) {
 }
 
 void phase_construction() {
+  sort(objectives.begin(), objectives.end());
   for (unsigned int i = 0; i < objectives.size(); i++) {
-    if (!is_protected(objectives[i])) {
-	construire_vers(objectives[i]);
+    if (!is_protected(objectives[i].pos)) {
+	construire_vers(objectives[i].pos);
     }
   }
   creer(magie(moi())/COUT_SORCIER);
@@ -107,7 +110,6 @@ void phase_construction() {
 
 void phase_deplacement() {
   update_danger();
-  position p2 = objectives[0];
   vector<position> positions = sorciers(moi());
   for (unsigned int i = 0; i < positions.size(); i++) {
     position p1 = positions[i];
