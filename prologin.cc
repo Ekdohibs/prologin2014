@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <queue>
 #include "prologin.hh"
+#include "max_flow.hh"
 using namespace std;
 
 #define INF 10000000
@@ -19,63 +20,6 @@ int capacites[MAXN][MAXN];
 int flot[MAXN][MAXN];
 #define START -1
 #define NONE -2
-void max_flow(int n) {
-  for (int i = 0; i < n; i++)
-    for (int j = 0; j < n; j++)
-      flot[i][j] = 0;
-  
-  while (true) {
-    for (int i = 0; i < n; i++)
-      prevs[i] = NONE;
-
-    file[0] = 0;
-    prevs[0] = START;
-    int index = 0;
-    int indexchange = 1;
-    int indexadd = 1;
-    
-    bool found = false;
-    while (index < indexchange) {
-      while (index < indexchange) {
-	int u = file[index++];
-	for (int v = 0; v < n; v++) {
-	  if (capacites[u][v] - flot[u][v] && prevs[v] == NONE) {
-	    prevs[v] = u;
-	    file[indexadd++] = v;
-	    if (v == n - 1) {
-	      found = true;
-	      break;
-	    }
-	  }
-	}
-      }
-      indexchange = indexadd;
-      if (found)
-	break;
-    }
-    if (!found)
-      return;
-
-    int cmin = INF;
-    {
-      int v = n - 1;
-      while (prevs[v] != START) {
-	int u = prevs[v];
-	cmin = min(cmin, capacites[u][v] - flot[u][v]);
-	v = u;
-      }
-    }
-    {
-      int v = n - 1;
-      while (prevs[v] != START) {
-	int u = prevs[v];
-	flot[u][v] += cmin;
-	flot[v][u] -= cmin;
-	v = u;
-      }
-    }
-  }
-}
 
 position mid(position p1, position p2) {
   return position((p1.x + p2.x)/2, (p1.y + p2.y)/2);
@@ -191,14 +135,14 @@ bool construire_vers(position objectif) {
 
 void phase_construction() {
   //creer(magie(moi())/COUT_SORCIER);
-  if (tour_actuel() < 6)
+  if (tour_actuel() < 5)
     construire_vers(fontaines[0]);
   else
     creer(magie(moi())/COUT_SORCIER);
 }
 
 void phase_deplacement() {
-  position p2 = fontaines[0];
+  position p2 = fontaines[3];
   vector<position> positions = sorciers(moi());
   for (unsigned int i = 0; i < positions.size(); i++) {
     position p1 = positions[i];
