@@ -354,11 +354,12 @@ static inline int tour_actuel()
 ///
 // Retourne la distance entre deux positions
 //
-extern "C" int api_distance(position depart, position arrivee);
-static inline int distance(position depart, position arrivee)
-{
-  return api_distance(depart, arrivee);
-}
+// BUGGED
+//extern "C" int api_distance(position depart, position arrivee);
+//static inline int distance(position depart, position arrivee)
+//{
+//  return api_distance(depart, arrivee);
+//}
 
 
 ///
