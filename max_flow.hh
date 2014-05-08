@@ -4,8 +4,6 @@
 #define MAX_FLOW_H
 
 #define MAXN 2000
-extern int file[MAXN];
-extern int prevs[MAXN];
 extern int capacites[MAXN][MAXN];
 extern int flot[MAXN][MAXN];
 void max_flow(int n);

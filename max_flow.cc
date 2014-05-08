@@ -7,6 +7,11 @@ using namespace std;
 #define NONE -2
 #define INF 10000000
 
+int file[MAXN];
+int prevs[MAXN];
+int capacites[MAXN][MAXN];
+int flot[MAXN][MAXN];
+
 void max_flow(int n) {
   for (int i = 0; i < n; i++)
     for (int j = 0; j < n; j++)

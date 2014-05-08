@@ -4,7 +4,7 @@ lib_TARGETS = champion
 
 # Tu peux rajouter des fichiers sources, headers, ou changer
 # des flags de compilation.
-champion-srcs = prologin.cc max_flow.cc
+champion-srcs = prologin.cc max_flow.cc chemin.cc common.cc
 champion-dists =
 champion-cxxflags = -O3 -ggdb3 -Wall -std=c++11
 

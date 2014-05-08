@@ -5,6 +5,8 @@
 #include <queue>
 #include "prologin.hh"
 #include "max_flow.hh"
+#include "chemin.hh"
+#include "common.hh"
 using namespace std;
 
 #define INF 10000000
@@ -12,14 +14,7 @@ using namespace std;
 vector<position> objectives;
 int players_ids[4];
 position fontaines[4];
-
-#define MAXN 2000
-int file[MAXN];
-int prevs[MAXN];
-int capacites[MAXN][MAXN];
-int flot[MAXN][MAXN];
-#define START -1
-#define NONE -2
+position artefact = position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2);
 
 position mid(position p1, position p2) {
   return position((p1.x + p2.x)/2, (p1.y + p2.y)/2);
@@ -43,29 +38,9 @@ void partie_debut() {
     fontaines[i] = mid(base_joueur(players_ids[i]), 
 		       base_joueur(players_ids[(i+1)%4]));
   }
+  objectives.push_back(artefact);
 }
 
-inline int distance(position p1, position p2) {
-  return abs(p1.x - p2.x) + abs(p1.y - p2.y);
-}
-
-inline bool valide(position pos) {
-  return (pos.x >= 0) && (pos.x < TAILLE_TERRAIN) &&
-    (pos.y >= 0) && (pos.y < TAILLE_TERRAIN);
-}
-
-vector<position> pos_in_range(position pos, int range) {
-  vector<position> positions;
-  for (int x = pos.x - range; x <= pos.x + range; x++) {
-    for (int y = pos.y - range; y <= pos.y + range; y++) {
-      position p = position(x, y);
-      if (valide(p) && distance(p, pos) <= range) {
-	positions.push_back(p);
-      }
-    }
-  }
-  return positions;
-}
 
 void deplacer_(position depart, position arrivee, int nb) {
   if (nb == 0) {
@@ -115,7 +90,6 @@ int nb_sorciers_adv(position p) {
 }
 
 bool construire_vers(position objectif) {
-  //vector<tourelle> tourelles = tourelles_joueur(players_id[0]);
   position pmin;
   int dmin = INF;
   for (int i = 0; i < TAILLE_TERRAIN; i++) {
@@ -133,16 +107,27 @@ bool construire_vers(position objectif) {
   return (construire(pmin, 3) == OK);
 }
 
+bool is_protected(position pos) {
+  vector<tourelle> tourelles = tourelles_joueur(moi());
+  for (unsigned int i = 0; i < tourelles.size(); i++) {
+    if (distance(pos, tourelles[i].pos) <= tourelles[i].portee) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void phase_construction() {
-  //creer(magie(moi())/COUT_SORCIER);
-  if (tour_actuel() < 5)
-    construire_vers(fontaines[0]);
-  else
-    creer(magie(moi())/COUT_SORCIER);
+  for (unsigned int i = 0; i < objectives.size(); i++) {
+    if (!is_protected(objectives[i])) {
+	construire_vers(objectives[i]);
+    }
+  }
+  creer(magie(moi())/COUT_SORCIER);
 }
 
 void phase_deplacement() {
-  position p2 = fontaines[3];
+  position p2 = objectives[0];
   vector<position> positions = sorciers(moi());
   for (unsigned int i = 0; i < positions.size(); i++) {
     position p1 = positions[i];
@@ -169,7 +154,7 @@ void phase_tirs() {
   }
   for (unsigned int i = 0; i < tourelles.size(); i++) {
     for (unsigned int j = 0; j < sadv.size(); j++) {
-      if (distance(tourelles[i].pos, sadv[j]) <= PORTEE_TOURELLE) {
+      if (distance(tourelles[i].pos, sadv[j]) <= tourelles[i].portee) {
 	capacites[i+1][j+m+1] = INF;
       }
     }
