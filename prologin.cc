@@ -12,13 +12,13 @@ vector<position> objectives;
 int players_ids[4];
 position fontaines[4];
 
-#define MAXN 2000;
+#define MAXN 2000
 int file[MAXN];
-int prev[MAXN];
+int prevs[MAXN];
 int capacites[MAXN][MAXN];
 int flot[MAXN][MAXN];
-#define START -1;
-#define NONE -2;
+#define START -1
+#define NONE -2
 void max_flow(int n) {
   for (int i = 0; i < n; i++)
     for (int j = 0; j < n; j++)
@@ -26,32 +26,32 @@ void max_flow(int n) {
   
   while (true) {
     for (int i = 0; i < n; i++)
-      prev[i] = NONE;
+      prevs[i] = NONE;
 
     file[0] = 0;
-    prev[0] = START;
-    index = 0;
-    indexchange = 1;
-    indexadd = 1;
+    prevs[0] = START;
+    int index = 0;
+    int indexchange = 1;
+    int indexadd = 1;
     
     bool found = false;
     while (index < indexchange) {
       while (index < indexchange) {
 	int u = file[index++];
 	for (int v = 0; v < n; v++) {
-	  if (capacites[u][v] - flot[u][v] && prev[v] == NONE) {
-	    prev[v] = u;
+	  if (capacites[u][v] - flot[u][v] && prevs[v] == NONE) {
+	    prevs[v] = u;
 	    file[indexadd++] = v;
 	    if (v == n - 1) {
 	      found = true;
-	      break
+	      break;
 	    }
 	  }
 	}
       }
       indexchange = indexadd;
       if (found)
-	break
+	break;
     }
     if (!found)
       return;
@@ -59,17 +59,19 @@ void max_flow(int n) {
     int cmin = INF;
     {
       int v = n - 1;
-      while (prev[v] != START) {
-	int u = prev[v];
+      while (prevs[v] != START) {
+	int u = prevs[v];
 	cmin = min(cmin, capacites[u][v] - flot[u][v]);
 	v = u;
       }
     }
     {
       int v = n - 1;
-      while (prev[v] != START) {
+      while (prevs[v] != START) {
+	int u = prevs[v];
 	flot[u][v] += cmin;
 	flot[v][u] -= cmin;
+	v = u;
       }
     }
   }
@@ -146,6 +148,28 @@ vector<position> sorciers(int joueur) {
   return positions;
 }
 
+vector<position> sorciers_adv() {
+  vector<position> positions;
+  for (int i = 0; i < TAILLE_TERRAIN; i++) {
+    for (int j = 0; j < TAILLE_TERRAIN; j++) {
+      position p = position(i, j);
+      for (int joueur = 1; joueur < 4; joueur ++) {
+	if (nb_sorciers(p, players_ids[joueur])) {
+	  positions.push_back(p);
+	  break;
+	}
+      }
+    }
+  }
+  return positions;
+}
+
+int nb_sorciers_adv(position p) {
+  return nb_sorciers(p, players_ids[1]) +
+    nb_sorciers(p ,players_ids[2]) +
+    nb_sorciers(p, players_ids[3]);
+}
+
 bool construire_vers(position objectif) {
   //vector<tourelle> tourelles = tourelles_joueur(players_id[0]);
   position pmin;
@@ -183,8 +207,35 @@ void phase_deplacement() {
 }
 
 void phase_tirs() {
-  vector<tourelles> tourelles = tourelles_joueur(moi());
-  
+  vector<tourelle> tourelles = tourelles_joueur(moi());
+  vector<position> sadv = sorciers_adv();
+  int n = tourelles.size() + sadv.size() + 2;
+  //assert(n <= MAXN);
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      capacites[i][j] = 0;
+    }
+  }
+  for (unsigned int i = 0; i < tourelles.size(); i++) {
+    capacites[0][i+1] = ATTAQUE_TOURELLE;
+  }
+  int m = tourelles.size(); 
+  for (unsigned int i = 0; i < sadv.size(); i++) {
+    capacites[i+m+1][n-1] = nb_sorciers_adv(sadv[i]);
+  }
+  for (unsigned int i = 0; i < tourelles.size(); i++) {
+    for (unsigned int j = 0; j < sadv.size(); j++) {
+      if (distance(tourelles[i].pos, sadv[j]) <= PORTEE_TOURELLE) {
+	capacites[i+1][j+m+1] = INF;
+      }
+    }
+  }
+  max_flow(n);
+  for (unsigned int i = 0; i < tourelles.size(); i++) {
+    for (unsigned int j = 0; j < sadv.size(); j++) {
+      tirer(flot[i+1][j+m+1], tourelles[i].pos, sadv[j]);
+    }
+  }
 }
 
 void phase_siege() {
