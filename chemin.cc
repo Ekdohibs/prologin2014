@@ -52,6 +52,17 @@ position deps[4] = {position(0, 1), position(0, -1), position(1, 0), position(-1
 
 position pres[TAILLE_TERRAIN][TAILLE_TERRAIN];
 
+vector<position> get_access(position p) {
+  vector<position> u = pos_in_range(p, PORTEE_SORCIER);
+  vector<position> v;
+  for (unsigned int i = 0; i < u.size(); i++) {
+    if (chemin(p, u[i]).size() <= PORTEE_SORCIER) {
+      v.push_back(u[i]);
+    }
+  }
+  return v;
+}
+
 vector<position> safe_chemin(position depart, position arrivee) {
   priority_queue<cle> tas;
   for (int i = 0; i < TAILLE_TERRAIN; i++) {
@@ -65,9 +76,10 @@ vector<position> safe_chemin(position depart, position arrivee) {
   while (!tas.empty()) {
     cle a = tas.top(); tas.pop();
     bool found = false;
-    for (int i = 0; i < 4; i++) {
-      position p = a.pos + deps[i];
-      if (!valide(p) || pres[p.x][p.y] != NONE)
+    vector<position> access = get_access(a.pos);
+    for (unsigned int i = 0; i < access.size(); i++) {
+      position p = access[i];
+      if (!valide(p) || pres[p.x][p.y] != NONE || info_case(p) == CASE_TOURELLE)
 	continue;
       pres[p.x][p.y] = a.pos;
       if (p == arrivee) {

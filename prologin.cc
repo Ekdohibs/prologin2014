@@ -25,7 +25,8 @@ void deplacer_(position depart, position arrivee, int nb) {
   }
   vector<position> path = safe_chemin(depart, arrivee);
   //dump_path(path);
-  int d = min((int)path.size(), PORTEE_SORCIER);
+  //int d = min((int)path.size(), PORTEE_SORCIER);
+  int d = min((int)path.size(), 1);
   if (d == 0) {
     return;
   }
@@ -111,7 +112,6 @@ void phase_deplacement() {
   for (unsigned int i = 0; i < positions.size(); i++) {
     position p1 = positions[i];
     int ns = nb_sorciers_deplacables(p1, moi());
-    cout << ns << endl;
     if (p1 == base_joueur(moi()))
       ns /= 2;
     deplacer_(p1, p2, ns);
