@@ -5,7 +5,24 @@
 #include "prologin.hh"
 using namespace std;
 
-void partie_debut() {}
+vector<position> objectives;
+int players_ids[4];
+
+void partie_debut() {
+  players_ids[0] = moi();
+  position pp = base_joueur(moi());
+  for (int i = 0; i < 3; i++) {
+    int id = adversaires()[i];
+    position p = base_joueur(id);
+    int k = 1;
+    if ((p.x == TAILLE_TERRAIN - 1 - pp.x) && (p.y == TAILLE_TERRAIN - 1 - pp.y)) {
+      k = 2;
+    } else if ((p.x == pp.y) && (p.y == TAILLE_TERRAIN - 1 - pp.x)) {
+      k = 3;
+    }
+    players_ids[k] = id;
+  }
+}
 
 inline int distance(position p1, position p2) {
   return abs(p1.x - p2.x) + abs(p1.y - p2.y);
@@ -41,7 +58,7 @@ void phase_construction() {
 }
 
 void phase_deplacement() {
-  position p2 = base_joueur((moi())%4 + 1);
+  position p2 = base_joueur(players_ids[1]);
   vector<position> positions = sorciers(moi());
   for (unsigned int i = 0; i < positions.size(); i++) {
     position p1 = positions[i];

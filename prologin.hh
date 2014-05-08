@@ -146,6 +146,9 @@ typedef struct position {
   int x;  /* <- Coordonnée en X */
   int y;  /* <- Coordonnée en Y */
   position(int x_, int y_):x(x_), y(y_) {};
+  inline bool operator == (const position &other) const {
+    return (x == other.x) && (y == other.y);
+  };
 } position;
 
 
