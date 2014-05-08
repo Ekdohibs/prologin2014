@@ -13,6 +13,16 @@ inline bool valide(position pos) {
     (pos.y >= 0) && (pos.y < TAILLE_TERRAIN);
 }
 
-std::vector<position> pos_in_range(position pos);
+inline position mid(position p1, position p2) {
+  return position((p1.x + p2.x)/2, (p1.y + p2.y)/2);
+}
+
+extern int players_ids[4];
+extern position fontaines[4];
+extern position artefact;
+extern std::vector<position> objectives;
+
+void partie_debut();
+std::vector<position> pos_in_range(position pos, int portee);
 
 #endif

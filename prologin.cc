@@ -11,42 +11,20 @@ using namespace std;
 
 #define INF 10000000
 
-vector<position> objectives;
-int players_ids[4];
-position fontaines[4];
-position artefact = position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2);
-
-position mid(position p1, position p2) {
-  return position((p1.x + p2.x)/2, (p1.y + p2.y)/2);
-}
-
-void partie_debut() {
-  players_ids[0] = moi();
-  position pp = base_joueur(moi());
-  for (int i = 0; i < 3; i++) {
-    int id = adversaires()[i];
-    position p = base_joueur(id);
-    int k = 1;
-    if ((p.x == TAILLE_TERRAIN - 1 - pp.x) && (p.y == TAILLE_TERRAIN - 1 - pp.y)) {
-      k = 2;
-    } else if ((p.x == pp.y) && (p.y == TAILLE_TERRAIN - 1 - pp.x)) {
-      k = 3;
-    }
-    players_ids[k] = id;
+void dump_path(vector<position> path) {
+  for (unsigned int i = 0; i < path.size(); i++) {
+    position p = path[i];
+    cout << "(" << p.x << ", " << p.y << ") ";
   }
-  for (int i = 0; i < 4; i++) {
-    fontaines[i] = mid(base_joueur(players_ids[i]), 
-		       base_joueur(players_ids[(i+1)%4]));
-  }
-  objectives.push_back(artefact);
+  cout << endl;
 }
-
 
 void deplacer_(position depart, position arrivee, int nb) {
   if (nb == 0) {
     return;
   }
-  vector<position> path = chemin(depart, arrivee);
+  vector<position> path = safe_chemin(depart, arrivee);
+  //dump_path(path);
   int d = min((int)path.size(), PORTEE_SORCIER);
   if (d == 0) {
     return;
@@ -127,11 +105,16 @@ void phase_construction() {
 }
 
 void phase_deplacement() {
+  update_danger();
   position p2 = objectives[0];
   vector<position> positions = sorciers(moi());
   for (unsigned int i = 0; i < positions.size(); i++) {
     position p1 = positions[i];
-    deplacer_(p1, p2, nb_sorciers_deplacables(p1, moi()));
+    int ns = nb_sorciers_deplacables(p1, moi());
+    cout << ns << endl;
+    if (p1 == base_joueur(moi()))
+      ns /= 2;
+    deplacer_(p1, p2, ns);
   }
 }
 

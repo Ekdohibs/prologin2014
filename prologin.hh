@@ -150,6 +150,12 @@ typedef struct position {
   inline bool operator == (const position &other) const {
     return (x == other.x) && (y == other.y);
   };
+  inline bool operator != (const position &other) const {
+    return (x != other.x) || (y != other.y);
+  };
+  inline position operator + (const position &other) const {
+    return position(x + other.x, y + other.y);
+  };
 } position;
 
 

@@ -3,6 +3,32 @@
 #include <vector>
 using namespace std;
 
+int players_ids[4];
+position fontaines[4];
+vector<position> objectives;
+position artefact = position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2);
+
+void partie_debut() {
+  players_ids[0] = moi();
+  position pp = base_joueur(moi());
+  for (int i = 0; i < 3; i++) {
+    int id = adversaires()[i];
+    position p = base_joueur(id);
+    int k = 1;
+    if ((p.x == TAILLE_TERRAIN - 1 - pp.x) && (p.y == TAILLE_TERRAIN - 1 - pp.y)) {
+      k = 2;
+    } else if ((p.x == pp.y) && (p.y == TAILLE_TERRAIN - 1 - pp.x)) {
+      k = 3;
+    }
+    players_ids[k] = id;
+  }
+  for (int i = 0; i < 4; i++) {
+    fontaines[i] = mid(base_joueur(players_ids[i]), 
+		       base_joueur(players_ids[(i+1)%4]));
+  }
+  objectives.push_back(artefact);
+}
+
 vector<position> pos_in_range(position pos, int range) {
   vector<position> positions;
   for (int x = pos.x - range; x <= pos.x + range; x++) {
