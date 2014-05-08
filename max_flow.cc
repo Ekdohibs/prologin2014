@@ -3,6 +3,10 @@
 #include <algorithm>
 using namespace std;
 
+#define START -1
+#define NONE -2
+#define INF 10000000
+
 void max_flow(int n) {
   for (int i = 0; i < n; i++)
     for (int j = 0; j < n; j++)
