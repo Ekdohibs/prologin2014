@@ -1,56 +1,35 @@
-///
-// This file has been generated, if you wish to
-// modify it in a permanent way, please refer
-// to the script file : gen/generator_cxx.rb
-//
-
+// Main file
+#include <vector>
+#include <iostream>
+#include <algorithm>
 #include "prologin.hh"
+using namespace std;
 
-///
-// Fonction appelée au début de la partie
-//
-void partie_debut()
-{
-  // fonction a completer
+void partie_debut() {}
+
+void deplacer_(position depart, position arrivee, int nb) {
+  vector<position> path = chemin(depart, arrivee);
+  int d = min((int)path.size(), PORTEE_SORCIER);
+  deplacer(depart, path[d-1], nb);
 }
 
-///
-// Fonction appelée pendant la phase de construction
-//
-void phase_construction()
-{
-  // fonction a completer
+void phase_construction() {
+  creer(magie(moi())/COUT_SORCIER);
 }
 
-///
-// Fonction appelée pendant la phase de déplacement
-//
-void phase_deplacement()
-{
-  // fonction a completer
+void phase_deplacement() {
+  position p1 = base_joueur(moi());
+  position p2 = base_joueur((moi() + 1)%4);
+  deplacer(p1, p2, nb_sorciers(p1, moi()));
 }
 
-///
-// Fonction appelée pendant la phase de tirs des tourelles
-//
-void phase_tirs()
-{
-  // fonction a completer
+void phase_tirs() {
+
 }
 
-///
-// Fonction appelée pendant la phase de siège des tourelles
-//
-void phase_siege()
-{
-  // fonction a completer
+void phase_siege() {
+
 }
 
-///
-// Fonction appelée à la fin de la partie
-//
-void partie_fin()
-{
-  // fonction a completer
-}
+void partie_fin() {}
 
