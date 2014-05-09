@@ -27,7 +27,7 @@ void update_danger() {
       vector<position> pos_atteignables = pos_in_range(tourelles[i].pos, tourelles[i].portee);
       for (unsigned int j = 0; j < pos_atteignables.size(); j++) {
 	position p = pos_atteignables[j];
-	danger[p.x][p.y]++;
+	danger[p.x][p.y] += 10;
       }
     }
   }

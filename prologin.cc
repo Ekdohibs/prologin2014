@@ -35,8 +35,10 @@ void deplacer_(position depart, position arrivee, int nb) {
     return;
   }
   position but = path.path[d-1];
-  if (nb <= danger[but.x][but.y])
+  if (nb <= danger[but.x][but.y]) {
+    deplacer(depart, depart, nb);
     return;
+  }
   deplacer(depart, but, nb);
 }
 
@@ -81,7 +83,7 @@ vector<tourelle> tourelles_adv() {
   return tourelles;
 }
 
-bool construire_vers(position objectif) {
+bool construire_vers(position objectif, bool force = false) {
   position pmin;
   int dmin = INF;
   for (int i = 0; i < TAILLE_TERRAIN; i++) {
@@ -93,10 +95,12 @@ bool construire_vers(position objectif) {
       }
     }
   }
-  vector<tourelle> tourelles = tourelles_joueur(moi());
   int ddmin = INF;
-  for (unsigned int i = 0; i < tourelles.size(); i++) {
-    ddmin = min(ddmin, distance(objectif, tourelles[i].pos));
+  vector<tourelle> tourelles = tourelles_joueur(moi());
+  if (!force) {
+    for (unsigned int i = 0; i < tourelles.size(); i++) {
+      ddmin = min(ddmin, distance(objectif, tourelles[i].pos));
+    }
   }
   if (dmin >= ddmin) {
     return false;
@@ -161,15 +165,25 @@ void update_objectives() {
   }
 }
 
+position autour_artefact[4] = {position(TAILLE_TERRAIN/2 - 1, TAILLE_TERRAIN/2),
+			       position(TAILLE_TERRAIN/2 + 1, TAILLE_TERRAIN/2),
+			       position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2 - 1),
+			       position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2 + 1)};
 void phase_construction() {
   update_objectives();
   if (tour_actuel() == 1) {
     creer(magie(moi())/COUT_SORCIER);
   } else if (tour_actuel() > 96 && tour_actuel() < 100 && !panic) {
     return;
-  } else if (tour_actuel() == 100) {
+  } else if (tour_actuel() == 100 && !panic) {
+    vector<tourelle> tourelles = tourelles_joueur(moi());
+    for (unsigned int i = 0; i < tourelles.size(); i++) {
+      if (distance(tourelles[i].pos, artefact) > 5) {
+	supprimer(tourelles[i].pos);
+      }
+    }
     for (int i = 0; i < 4; i++) {
-      construire_vers(position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2));
+      construire(autour_artefact[i], 3);
     }
     return;
   }
