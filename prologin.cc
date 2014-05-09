@@ -27,9 +27,9 @@ void dump_path(vector<position> path) {
 
 position endgame_goal = artefact;
 
-void deplacer_(position depart, position arrivee, int nb) {
+bool deplacer_(position depart, position arrivee, int nb) {
   if (nb == 0) {
-    return;
+    return true;
   }
   safe_path path = safe_chemin(depart, arrivee);
   //if (nb <= path.danger)
@@ -38,14 +38,15 @@ void deplacer_(position depart, position arrivee, int nb) {
   //int d = min((int)path.size(), PORTEE_SORCIER);
   int d = min((int)path.path.size(), 1);
   if (d == 0) {
-    return;
+    return false;
   }
   position but = path.path[d-1];
   if (((nb <= danger[but.x][but.y] || (nb <= path.danger + 10*(int)path.path.size() && danger[but.x][but.y] > 0)) && tour_actuel() < 100) || (tour_actuel() >= 95 && tour_actuel() < 100 && but == endgame_goal)) {
     deplacer(depart, depart, nb);
-    return;
+    return true;
   }
   deplacer(depart, but, nb);
+  return true;
 }
 
 vector<position> sorciers(int joueur) {
@@ -190,7 +191,8 @@ void update_objectives() {
     panic = false;
   }
   menace_base = menace;
-  if (menace > nb_sorciers(base_joueur(moi()), moi())) {
+  int ns = nb_sorciers(base_joueur(moi()), moi());
+  if (menace > ns || menace2 >= 2*ns) {
     //objective panic = objective(base_joueur(moi()), 100, 3, 10, 200);
     //panic.tower_s = 3;
     //objectives.push_back(panic);
@@ -258,7 +260,7 @@ void phase_construction() {
     }
   }
   if(panic) {
-    while(construire_vers(base_joueur(moi())));
+    while(construire_vers(base_joueur(moi()), true));
   }
   sort(objectives.begin(), objectives.end());
   for (unsigned int i = 0; i < objectives.size(); i++) {
@@ -335,9 +337,10 @@ void phase_deplacement() {
       }
     }
     if (omin == -1) {
-      if (panic) {
-	deplacer(p1, base_joueur(moi()), ns);
-      }
+      //if (panic) {
+	position pp = base_joueur(moi());
+	deplacer(p1, pp, ns);
+	//}
       continue;
     }
     objectives_sorciers[omin] -= ns;
@@ -432,11 +435,13 @@ void phase_siege() {
     }
   }
   max_flow(n);
+  //for (unsigned int u = 0; u < 10; u++) {
   for (unsigned int i = 0; i < tourelles.size(); i++) {
     for (unsigned int j = 0; j < smoi.size(); j++) {
       assieger(smoi[j], tourelles[i].pos, flot[i+1][j+m+1]);
     }
   }
+  //}
 
   tact++;
 }
