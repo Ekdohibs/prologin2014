@@ -41,7 +41,7 @@ void deplacer_(position depart, position arrivee, int nb) {
     return;
   }
   position but = path.path[d-1];
-  if (((nb <= danger[but.x][but.y] || (nb <= path.danger + 30 && danger[but.x][but.y] > 0)) && tour_actuel() < 100) || (tour_actuel() >= 95 && tour_actuel() < 100 && but == endgame_goal)) {
+  if (((nb <= danger[but.x][but.y] || (nb <= path.danger + 10*(int)path.path.size() && danger[but.x][but.y] > 0)) && tour_actuel() < 100) || (tour_actuel() >= 95 && tour_actuel() < 100 && but == endgame_goal)) {
     deplacer(depart, depart, nb);
     return;
   }
@@ -226,7 +226,7 @@ void phase_construction() {
     creer(magie(moi())/COUT_SORCIER);
   } else if (tour_actuel() > 96 && tour_actuel() < 100 && !panic) {
     return;
-  } else if (tour_actuel() == 100 && !panic) {
+  } else if (tour_actuel() == 100 && !panic && endgame_goal != artefact) {
     vector<tourelle> tourelles = tourelles_joueur(moi());
     for (unsigned int i = 0; i < tourelles.size(); i++) {
       if (distance(tourelles[i].pos, artefact) > 5) {
