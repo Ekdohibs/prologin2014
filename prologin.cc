@@ -25,6 +25,8 @@ void dump_path(vector<position> path) {
   cout << endl;
 }
 
+position endgame_goal = artefact;
+
 void deplacer_(position depart, position arrivee, int nb) {
   if (nb == 0) {
     return;
@@ -39,12 +41,10 @@ void deplacer_(position depart, position arrivee, int nb) {
     return;
   }
   position but = path.path[d-1];
-  if (((nb <= danger[but.x][but.y] || (nb <= path.danger + 30 && danger[but.x][but.y] > 0)) && tour_actuel() < 100) || (tour_actuel() >= 95 && tour_actuel() < 100 && but == artefact)) {
+  if (((nb <= danger[but.x][but.y] || (nb <= path.danger + 30 && danger[but.x][but.y] > 0)) && tour_actuel() < 100) || (tour_actuel() >= 95 && tour_actuel() < 100 && but == endgame_goal)) {
     deplacer(depart, depart, nb);
     return;
   }
-  if (but == artefact)
-    cout << tour_actuel() << endl;
   deplacer(depart, but, nb);
 }
 
@@ -60,6 +60,18 @@ vector<position> sorciers(int joueur) {
   }
   return positions;
 }
+
+
+int nb_sorciers_joueur(int joueur) {
+  int s = 0;
+  for (int i = 0; i < TAILLE_TERRAIN; i++) {
+    for (int j = 0; j < TAILLE_TERRAIN; j++) {
+      s += nb_sorciers(position(i, j), joueur);
+    }
+  }
+  return s;
+}
+
 
 vector<position> sorciers_adv() {
   vector<position> positions;
@@ -135,6 +147,29 @@ int jbase(position p) {
   return (((p.y != pp.y) << 1) | ((p.y != pp.y) ^ (p.x != pp.x)));
 }
 
+void endgame_objectives() {
+    objectives.push_back(objective(fontaines[0], 5, 1000000, 1, 1));
+    objectives.push_back(objective(fontaines[3], 5, 1000000, 1, 1));
+    objectives.push_back(objective(fontaines[1], 5, 1000000, 1, 1));
+    objectives.push_back(objective(fontaines[2], 5, 1000000, 1, 1));
+    int nsmax = 0;
+    int jmax = 0;
+    for (int i = 0; i < 4; i++) {
+      if (nb_sorciers_joueur(players_ids[i]) > nsmax) {
+	nsmax = nb_sorciers_joueur(players_ids[i]);
+	jmax = i;
+      }
+    }
+    if (jmax == 0) {
+      objectives.push_back(objective(artefact, 10, 1, 2, 100000));
+      endgame_goal = artefact;
+    } else {
+      position b = base_joueur(players_ids[jmax]);
+      objectives.push_back(objective(b, 10, 1000000, 1, 100000));
+      endgame_goal = b;
+    }
+}
+
 int menace_base = 0;
 void update_objectives() {
   cout << "Objectives\n";
@@ -162,12 +197,8 @@ void update_objectives() {
     panic = true;
     cout << "Panic mode\n";
   }
-  if (tour_actuel() >= 92) {
-    objectives.push_back(objective(artefact, 10, 1, 2, 100000));
-    objectives.push_back(objective(fontaines[0], 5, 1000000, 1, 1));
-    objectives.push_back(objective(fontaines[3], 5, 1000000, 1, 1));
-    objectives.push_back(objective(fontaines[1], 5, 1000000, 1, 1));
-    objectives.push_back(objective(fontaines[2], 5, 1000000, 1, 1));
+  if (tour_actuel() == 92) {
+    endgame_objectives();
     return;
   }
  
