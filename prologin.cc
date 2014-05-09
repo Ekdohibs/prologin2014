@@ -228,7 +228,7 @@ void phase_construction() {
     creer(magie(moi())/COUT_SORCIER);
   } else if (tour_actuel() > 96 && tour_actuel() < 100 && !panic) {
     return;
-  } else if (tour_actuel() == 100 && !panic && endgame_goal != artefact) {
+  } else if (tour_actuel() == 100 && !panic && (endgame_goal != artefact || (joueur_case(artefact) == -1) || true)) {
     vector<tourelle> tourelles = tourelles_joueur(moi());
     for (unsigned int i = 0; i < tourelles.size(); i++) {
       if (distance(tourelles[i].pos, artefact) > 5) {
