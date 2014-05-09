@@ -229,7 +229,7 @@ position autour_artefact[4] = {position(TAILLE_TERRAIN/2 - 1, TAILLE_TERRAIN/2),
 			       position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2 - 1),
 			       position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2 + 1)};
 
-void phase_construction_() {
+inline void phase_construction_() {
   update_objectives();
   if (tour_actuel() == 1) {
     creer(magie(moi())/COUT_SORCIER);
@@ -293,7 +293,7 @@ void phase_construction() {
   cout << moi() << " phase_constuction : " << ((float)t)/CLOCKS_PER_SEC << "s\n"; 
 }
 
-void phase_deplacement_() {
+inline void phase_deplacement_() {
   update_danger();
   cout << "Deplacement\n";
   vector<position> positions = sorciers(moi());
@@ -400,7 +400,7 @@ void phase_deplacement() {
   cout << moi() << " phase_deplacements : " << ((float)t)/CLOCKS_PER_SEC << "s\n"; 
 }
 
-void phase_tirs_() {
+inline void phase_tirs_() {
   vector<tourelle> tourelles = tourelles_joueur(moi());
   vector<position> sadv = sorciers_adv();
   int n = tourelles.size() + sadv.size() + 2;
@@ -440,7 +440,7 @@ void phase_tirs() {
   cout << moi() << " phase_tirs : " << ((float)t)/CLOCKS_PER_SEC << "s\n"; 
 }
 
-void phase_siege_() {
+inline void phase_siege_() {
   vector<tourelle> tourelles = tourelles_adv();
   vector<position> smoi = sorciers(moi());
   int n = tourelles.size() + smoi.size() + 2;
