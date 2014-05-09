@@ -93,7 +93,12 @@ bool construire_vers(position objectif) {
       }
     }
   }
-  if (dmin == INF) {
+  vector<tourelle> tourelles = tourelles_joueur(moi());
+  int ddmin = INF;
+  for (unsigned int i = 0; i < tourelles.size(); i++) {
+    ddmin = min(ddmin, distance(objectif, tourelles[i].pos));
+  }
+  if (dmin >= ddmin) {
     return false;
   }
   return (construire(pmin, 3) == OK);
@@ -116,7 +121,7 @@ inline bool elimine(int joueur) {
 int jbase(position p) {
   if ((p.x != 0 && p.x != TAILLE_TERRAIN - 1) || (p.y != 0 && p.y != TAILLE_TERRAIN - 1))
     return -1;
-  return ((p.y != 0) << 1) | ((p.y != 0) ^ (p.x != 0));
+  return (((p.y != 0) << 1) | ((p.y != 0) ^ (p.x != 0))) + 1;
 }
 
 void update_objectives() {
@@ -160,6 +165,13 @@ void phase_construction() {
   update_objectives();
   if (tour_actuel() == 1) {
     creer(magie(moi())/COUT_SORCIER);
+  } else if (tour_actuel() > 96 && tour_actuel() < 100 && !panic) {
+    return;
+  } else if (tour_actuel() == 100) {
+    for (int i = 0; i < 4; i++) {
+      construire_vers(position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2));
+    }
+    return;
   }
   vector<tourelle> tourelles = tourelles_joueur(moi());
   bool utilise[9]  = {false};
@@ -168,7 +180,7 @@ void phase_construction() {
     int jmin = 0;
     for (unsigned int j = 0; j < tourelles.size(); j++) {
       if (distance(tourelles[j].pos, objectives[i].pos) < dmin) {
-	dmin = distance(tourelles[i].pos, objectives[i].pos);
+	dmin = distance(tourelles[j].pos, objectives[i].pos);
 	jmin = j;
       }
     }

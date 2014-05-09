@@ -29,8 +29,8 @@ void partie_debut() {
   objectives.push_back(objective(artefact, 25, 1, 2, 10));
   objectives.push_back(objective(fontaines[0], 15, 1, 2, 10));
   objectives.push_back(objective(fontaines[3], 14, 1, 2, 10));
-  objectives.push_back(objective(fontaines[1], 6, 1, 2, 0));
-  objectives.push_back(objective(fontaines[2], 5, 1, 2, 0));
+  objectives.push_back(objective(fontaines[1], 6, 1, 2, 2));
+  objectives.push_back(objective(fontaines[2], 5, 1, 2, 2));
   objectives.push_back(objective(base_joueur(players_ids[1]), 43, 2, 2, 20));;
   objectives.push_back(objective(base_joueur(players_ids[3]), 37, 2, 2, 10));;
   objectives.push_back(objective(base_joueur(players_ids[2]), 42, 2, 2, 20));;
