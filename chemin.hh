@@ -1,6 +1,7 @@
 #include "prologin.hh"
 #include <vector>
 
+extern int danger[TAILLE_TERRAIN][TAILLE_TERRAIN];
 void update_danger();
 struct safe_path {
   int danger;

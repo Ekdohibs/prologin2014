@@ -11,6 +11,8 @@ using namespace std;
 
 #define INF 10000000
 
+bool panic = false;
+
 void dump_path(vector<position> path) {
   for (unsigned int i = 0; i < path.size(); i++) {
     position p = path[i];
@@ -32,7 +34,10 @@ void deplacer_(position depart, position arrivee, int nb) {
   if (d == 0) {
     return;
   }
-  deplacer(depart, path.path[d-1], nb);
+  position but = path.path[d-1];
+  if (nb <= danger[but.x][but.y])
+    return;
+  deplacer(depart, but, nb);
 }
 
 vector<position> sorciers(int joueur) {
@@ -63,6 +68,17 @@ vector<position> sorciers_adv() {
     }
   }
   return positions;
+}
+
+vector<tourelle> tourelles_adv() {
+  vector<tourelle> tourelles = tourelles_joueur(players_ids[1]);
+  for (int i = 2; i < 4; i++) {
+    vector<tourelle> tt = tourelles_joueur(players_ids[i]);
+    for (unsigned int j = 0; j < tt.size(); j++) {
+      tourelles.push_back(tt[j]);
+    }
+  }
+  return tourelles;
 }
 
 bool construire_vers(position objectif) {
@@ -104,19 +120,28 @@ int jbase(position p) {
 }
 
 void update_objectives() {
+  cout << "Objectives\n";
   vector<objective> old_objectives;
   objectives.swap(old_objectives);
   vector<position> sadv = sorciers_adv();
   int menace = 0;
+  int menace2 = 0;
   for (unsigned int i = 0; i < sadv.size(); i++) {
     if (distance(sadv[i], base_joueur(moi())) <= PORTEE_SORCIER) {
       menace += nb_sorciers_adv(sadv[i]);
     }
+    if (distance(sadv[i], base_joueur(moi())) <= 2*PORTEE_SORCIER) {
+      menace += nb_sorciers_adv(sadv[i]);
+    }
+  }
+  if (menace2 < nb_sorciers(base_joueur(moi()), moi()) && menace < nb_sorciers(base_joueur(moi()), moi())/2) {
+    panic = false;
   }
   if (menace > nb_sorciers(base_joueur(moi()), moi())) {
-    objective panic = objective(base_joueur(moi()), 5, 3, 10);
-    panic.tower_s = 3;
-    objectives.push_back(panic);
+    //objective panic = objective(base_joueur(moi()), 100, 3, 10, 200);
+    //panic.tower_s = 3;
+    //objectives.push_back(panic);
+    panic = true;
     cout << "Panic mode\n";
   }
   for (unsigned int i = 0; i < old_objectives.size(); i++) {
@@ -135,6 +160,29 @@ void phase_construction() {
   update_objectives();
   if (tour_actuel() == 1) {
     creer(magie(moi())/COUT_SORCIER);
+  }
+  vector<tourelle> tourelles = tourelles_joueur(moi());
+  bool utilise[9]  = {false};
+  for (unsigned int i = 0; i < objectives.size(); i++) {
+    int dmin = INF;
+    int jmin = 0;
+    for (unsigned int j = 0; j < tourelles.size(); j++) {
+      if (distance(tourelles[j].pos, objectives[i].pos) < dmin) {
+	dmin = distance(tourelles[i].pos, objectives[i].pos);
+	jmin = j;
+      }
+    }
+    utilise[jmin] = true;
+  }
+  for (unsigned int i = 0; i < tourelles.size(); i++) {
+    if (!utilise[i]) {
+      cout << tourelles[i].pos.x << " " << tourelles[i].pos.y << "\n";
+      supprimer(tourelles[i].pos);
+    }
+  }
+  if(panic) {
+    for (int i = 0; i < 2; i++)
+      construire_vers(base_joueur(moi()));
   }
   sort(objectives.begin(), objectives.end());
   for (unsigned int i = 0; i < objectives.size(); i++) {
@@ -155,18 +203,65 @@ void phase_construction() {
 
 void phase_deplacement() {
   update_danger();
+  cout << "Deplacement\n";
   vector<position> positions = sorciers(moi());
-  for (unsigned int i = 0; i < positions.size(); i++) {
+  vector<int> objectives_sorciers;
+  for (unsigned int i = 0; i < objectives.size(); i++) {
+    objectives_sorciers.push_back(objectives[i].sorciers);
+  }
+  while (1) {
+    int smax = 0;
+    int imax = -1;
+    for (unsigned int i = 0; i < objectives.size(); i++) {
+      if (objectives_sorciers[i] > smax) {
+	smax = objectives_sorciers[i];
+	imax = i;
+      }
+    }
+    if (smax == 0)
+      return;
+
+    int dmin = INF;
+    int omin = -1;
+    for (unsigned int i = 0; i < positions.size(); i++) {
+      int ns = nb_sorciers_deplacables(positions[i], moi());
+      if ((ns > 0) && (distance(positions[i], objectives[imax].pos) < dmin)) {
+	dmin = distance(positions[i], objectives[imax].pos);
+	omin = i;
+      }
+    }
+    if (dmin == INF)
+      return;
+    
+    int ns = min(objectives_sorciers[imax], nb_sorciers_deplacables(positions[omin], moi()));
+    objectives_sorciers[imax] -= ns;
+    deplacer_(positions[omin], objectives[imax].pos, ns);
+    
+  }
+  /*for (unsigned int i = 0; i < positions.size(); i++) {
     position p1 = positions[i];
     int ns = nb_sorciers_deplacables(p1, moi());
     if (p1 == base_joueur(moi())) {
       ns /= 2;
     }
-    vector<unsigned int> objs;
-    //if (p1 == base_joueur(moi())) {
-      for (unsigned int i = 0; i < objectives.size(); i++) {
-	objs.push_back(i);
+    int dmin = INF;
+    int omin = -1;
+    unsigned int os = min((int)objectives.size(), 4); 
+    for (unsigned int j = 0; j < os; j++) {
+      if (distance(p1, objectives[j].pos) < dmin && objectives_sorciers[j] > 0) {
+	dmin = distance(p1, objectives[j].pos);
+	omin = j;
       }
+    }
+    if (omin == -1)
+      continue;
+    objectives_sorciers[omin] -= ns;
+    deplacer_(p1, objectives[omin].pos, ns);*/
+    //vector<unsigned int> objs;
+    //if (p1 == base_joueur(moi())) {
+    //  for (unsigned int i = 0; i < objectives.size(); i++) {
+    //	objs.push_back(i);
+    //  }
     /*} else {
       int dmin = INF;
       for (unsigned int i = 0; i < objectives.size(); i++) {
@@ -180,17 +275,17 @@ void phase_deplacement() {
 	}
       }
     }*/
-    int s = 0;
-    for (unsigned int i = 0; i < objs.size(); i++) {
-      s += objectives[objs[i]].value;
-    }
-    s = objectives[0].value;
-    objs.clear(); objs.push_back(0);
-    for (unsigned int i = 0; i < objs.size(); i++) {
-      deplacer_(p1, objectives[objs[i]].pos, (objectives[objs[i]].value*ns)/s);
-    }
+    //int s = 0;
+    //for (unsigned int i = 0; i < objs.size(); i++) {
+    //  s += objectives[objs[i]].value;
+    //}
+    //s = objectives[0].value;
+    //objs.clear(); objs.push_back(0);
+    //for (unsigned int i = 0; i < objs.size(); i++) {
+    //  deplacer_(p1, objectives[objs[i]].pos, (objectives[objs[i]].value*ns)/s);
+    //}
     //cout << endl;
-  }
+  //}
 }
 
 void phase_tirs() {
@@ -209,8 +304,6 @@ void phase_tirs() {
   int m = tourelles.size(); 
   for (unsigned int i = 0; i < sadv.size(); i++) {
     int d = nb_sorciers_adv(sadv[i]);
-    //if (d == 0)
-    //  d = 10; // Tour
     capacites[i+m+1][n-1] = d;
   }
   for (unsigned int i = 0; i < tourelles.size(); i++) {
@@ -229,7 +322,35 @@ void phase_tirs() {
 }
 
 void phase_siege() {
-
+  vector<tourelle> tourelles = tourelles_adv();
+  vector<position> smoi = sorciers(moi());
+  int n = tourelles.size() + smoi.size() + 2;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      capacites[i][j] = 0;
+    }
+  }
+  for (unsigned int i = 0; i < tourelles.size(); i++) {
+    capacites[0][i+1] = tourelles[i].vie;
+  }
+  int m = tourelles.size(); 
+  for (unsigned int i = 0; i < smoi.size(); i++) {
+    int d = nb_sorciers(smoi[i], moi());
+    capacites[i+m+1][n-1] = d;
+  }
+  for (unsigned int i = 0; i < tourelles.size(); i++) {
+    for (unsigned int j = 0; j < smoi.size(); j++) {
+      if (distance(tourelles[i].pos, smoi[j]) <= 1) {
+	capacites[i+1][j+m+1] = INF;
+      }
+    }
+  }
+  max_flow(n);
+  for (unsigned int i = 0; i < tourelles.size(); i++) {
+    for (unsigned int j = 0; j < smoi.size(); j++) {
+      assieger(smoi[j], tourelles[i].pos, flot[i+1][j+m+1]);
+    }
+  }
 }
 
 void partie_fin() {}

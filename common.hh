@@ -34,11 +34,14 @@ struct objective {
   int tower_s;
   int tower_increase_delay;
   int tower_increase_s;
+  int sorciers;
 
   objective() {};
-  objective(position pos_, int value_, int tower_delay_, int tower_increase_delay_):
+  objective(position pos_, int value_, int tower_delay_, int tower_increase_delay_,
+	    int sorciers_):
     pos(pos_), value(value_), tower_delay(tower_delay_), tower_s(0),
-    tower_increase_delay(tower_increase_delay_), tower_increase_s(0) {};
+    tower_increase_delay(tower_increase_delay_), tower_increase_s(0),
+    sorciers(sorciers_) {};
 
   inline bool operator < (const objective &other) const {
     return value > other.value;
