@@ -295,12 +295,55 @@ void phase_construction() {
 
 inline void phase_deplacement_() {
   update_danger();
+  if (elimine(moi())) {
+    return;
+  }
   cout << "Deplacement\n";
   vector<position> positions = sorciers(moi());
   vector<int> objectives_sorciers;
   for (unsigned int i = 0; i < objectives.size(); i++) {
     objectives_sorciers.push_back(objectives[i].sorciers);
   }
+  int n = positions.size() + objectives_sorciers.size() + 2;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      capacites[i][j] = 0;
+      prix[i][j] = 0;
+    }
+  }
+
+  for (unsigned int i = 0; i < positions.size(); i++) {
+    capacites[0][i+1] = nb_sorciers(positions[i], moi());
+  }
+  int m = positions.size();
+  for (unsigned int i = 0; i < objectives_sorciers.size(); i++) {
+    capacites[i+m+1][n-1] = objectives_sorciers[i];
+  }
+  for (unsigned int i = 0; i < positions.size(); i++) {
+    for (unsigned int j = 0; j < objectives_sorciers.size(); j++) {
+      safe_path path = safe_chemin(positions[i], objectives[j].pos);
+      int cout = path.path.size() + 3;
+      int capacite = INF;
+      if (positions[i] == objectives[j].pos) {
+	cout = 0;
+      } else if (cout == 3) {
+	cout = INF;
+	capacite = 0;
+      }
+      capacites[i+1][j+m+1] = capacite;
+      prix[i+1][j+m+1] = cout;
+      prix[j+m+1][i+1] = -cout;
+    }
+  }
+  
+  max_flow_min_cout(n);
+  for (unsigned int i = 0; i < positions.size(); i++) {
+    for (unsigned int j = 0; j < objectives_sorciers.size(); j++) {
+      deplacer_(positions[i], objectives[j].pos, flot[i+1][j+m+1]);
+    }
+  }
+
+  return;
   /*while (1) {
     int smax = 0;
     int imax = -1;
