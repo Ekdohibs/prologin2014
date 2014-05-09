@@ -321,18 +321,20 @@ void phase_deplacement() {
     int ns = nb_sorciers_deplacables(p1, moi());
     if (p1 == base_joueur(moi())) {
       ns = max(0, ns - 2*menace_base);
+    } else if (info_case(p1) == CASE_FONTAINE) {
+      ns = max(0, ns - 10);
     }
-    int dmin = INF;
+    float dmin = INF;
     int omin = -1;
     //int dmin = INF;
     //int omin = -1;
     if(panic)
-      dmin = 10*distance(p1, base_joueur(moi()))/(150);
+      dmin = 10*distance(p1, base_joueur(moi()))/(150.);
     //unsigned int os = min((int)objectives.size(), 4); 
     unsigned int os = objectives.size();
     for (unsigned int j = 0; j < os; j++) {
-      if ((10*distance(p1, objectives[j].pos))/objectives[j].value < dmin && objectives_sorciers[j] > 0) {
-	dmin = (10*distance(p1, objectives[j].pos))/objectives[j].value;
+      if ((10.*distance(p1, objectives[j].pos))/objectives[j].value < dmin && objectives_sorciers[j] > 0) {
+	dmin = (10.*distance(p1, objectives[j].pos))/objectives[j].value;
 	omin = j;
       }
     }
