@@ -18,7 +18,7 @@ int danger[TAILLE_TERRAIN][TAILLE_TERRAIN];
 void update_danger() {
   for (int i = 0; i < TAILLE_TERRAIN; i++) {
     for (int j = 0; j < TAILLE_TERRAIN; j++) {
-      danger[i][j] = 0;
+      danger[i][j] = nb_sorciers_adv(position(i, j));
     }
   }
   for (int adv = 1; adv < 4; adv++) {

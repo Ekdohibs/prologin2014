@@ -21,13 +21,21 @@ extern int players_ids[4];
 extern position fontaines[4];
 extern position artefact;
 
+inline int nb_sorciers_adv(position p) {
+  return nb_sorciers(p, players_ids[1]) +
+    nb_sorciers(p ,players_ids[2]) +
+    nb_sorciers(p, players_ids[3]);
+}
+
 struct objective {
   position pos;
   int value;
-  
+  int tower_delay;
+  int tower_s;
+
   objective() {};
-  objective(position pos_, int value_):
-    pos(pos_), value(value_) {};
+  objective(position pos_, int value_, int tower_delay_):
+    pos(pos_), value(value_), tower_delay(tower_delay_), tower_s(0) {};
 
   inline bool operator < (const objective &other) const {
     return value > other.value;

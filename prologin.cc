@@ -65,12 +65,6 @@ vector<position> sorciers_adv() {
   return positions;
 }
 
-int nb_sorciers_adv(position p) {
-  return nb_sorciers(p, players_ids[1]) +
-    nb_sorciers(p ,players_ids[2]) +
-    nb_sorciers(p, players_ids[3]);
-}
-
 bool construire_vers(position objectif) {
   position pmin;
   int dmin = INF;
@@ -99,14 +93,55 @@ bool is_protected(position pos) {
   return false;
 }
 
+inline bool elimine(int joueur) {
+  return joueur_case(base_joueur(joueur)) != joueur;
+}
+
+int jbase(position p) {
+  if ((p.x != 0 && p.x != TAILLE_TERRAIN - 1) || (p.y != 0 && p.y != TAILLE_TERRAIN - 1))
+    return -1;
+  return ((p.y != 0) << 1) | ((p.y != 0) ^ (p.x != 0));
+}
+
+void update_objectives() {
+  vector<objective> old_objectives;
+  objectives.swap(old_objectives);
+  vector<position> sadv = sorciers_adv();
+  int menace = 0;
+  for (unsigned int i = 0; i < sadv.size(); i++) {
+    if (distance(sadv[i], base_joueur(moi())) <= PORTEE_SORCIER) {
+      menace += nb_sorciers_adv(sadv[i]);
+    }
+  }
+  if (menace > nb_sorciers(base_joueur(moi()), moi())) {
+    objective panic = objective(base_joueur(moi()), 5, 3);
+    panic.tower_s = 3;
+    objectives.push_back(panic);
+    cout << "Panic mode\n";
+  }
+  for (unsigned int i = 0; i < old_objectives.size(); i++) {
+    int j = jbase(old_objectives[i].pos);
+    if (j != -1) {
+      if (!elimine(players_ids[j])) {
+	objectives.push_back(old_objectives[i]);
+      }
+    } else {
+    }
+  }
+}
+
 void phase_construction() {
+  update_objectives();
   if (tour_actuel() == 1) {
     creer(magie(moi())/COUT_SORCIER);
   }
   sort(objectives.begin(), objectives.end());
   for (unsigned int i = 0; i < objectives.size(); i++) {
-    if (!is_protected(objectives[i].pos)) {
-	construire_vers(objectives[i].pos);
+    objectives[i].tower_s += 1;
+    if (objectives[i].tower_s >= objectives[i].tower_delay) {
+      if (construire_vers(objectives[i].pos)) {
+	objectives[i].tower_s = 0;
+      }
     }
   }
   creer(magie(moi())/COUT_SORCIER);
