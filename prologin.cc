@@ -125,7 +125,8 @@ inline bool elimine(int joueur) {
 int jbase(position p) {
   if ((p.x != 0 && p.x != TAILLE_TERRAIN - 1) || (p.y != 0 && p.y != TAILLE_TERRAIN - 1))
     return -1;
-  return (((p.y != 0) << 1) | ((p.y != 0) ^ (p.x != 0)));
+  position pp = base_joueur(moi());
+  return (((p.y != pp.y) << 1) | ((p.y != pp.y) ^ (p.x != pp.x)));
 }
 
 int menace_base = 0;
