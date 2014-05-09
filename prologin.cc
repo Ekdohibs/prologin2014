@@ -41,7 +41,7 @@ bool deplacer_(position depart, position arrivee, int nb) {
     return false;
   }
   position but = path.path[d-1];
-  if (((nb <= danger[but.x][but.y] || (nb <= path.danger + 10*(int)path.path.size() && danger[but.x][but.y] > 0)) && tour_actuel() < 100) || (tour_actuel() >= 95 && tour_actuel() < 100 && but == endgame_goal)) {
+  if (((nb <= danger[but.x][but.y] || (nb <= path.danger + 10*(int)path.path.size() && danger[but.x][but.y] > 0)) && tour_actuel() < 95) || (tour_actuel() >= 95 && tour_actuel() < 100 && but == endgame_goal)) {
     deplacer(depart, depart, nb);
     return true;
   }
