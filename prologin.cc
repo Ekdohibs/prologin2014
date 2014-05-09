@@ -161,14 +161,14 @@ void endgame_objectives() {
 	jmax = i;
       }
     }
-    if (jmax == 0) {
+    //if (jmax == 0) {
       objectives.push_back(objective(artefact, 10, 1, 2, 100000));
       endgame_goal = artefact;
-    } else {
-      position b = base_joueur(players_ids[jmax]);
-      objectives.push_back(objective(b, 10, 1000000, 1, 100000));
-      endgame_goal = b;
-    }
+      //} else {
+      //position b = base_joueur(players_ids[jmax]);
+      //objectives.push_back(objective(b, 10, 1000000, 1, 100000));
+      //endgame_goal = b;
+      //}
 }
 
 int menace_base = 0;
@@ -192,7 +192,7 @@ void update_objectives() {
   }
   menace_base = menace;
   int ns = nb_sorciers(base_joueur(moi()), moi());
-  if (menace > ns || menace2 >= 2*ns) {
+  if (menace > ns || menace2 > 2*ns) {
     //objective panic = objective(base_joueur(moi()), 100, 3, 10, 200);
     //panic.tower_s = 3;
     //objectives.push_back(panic);
