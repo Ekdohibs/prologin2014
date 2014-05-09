@@ -12,7 +12,11 @@ using namespace std;
 #define INF 10000000
 
 bool panic = false;
+int tact = 0;
 
+inline int tour_actuel() {
+  return tact;
+}
 void dump_path(vector<position> path) {
   for (unsigned int i = 0; i < path.size(); i++) {
     position p = path[i];
@@ -35,10 +39,12 @@ void deplacer_(position depart, position arrivee, int nb) {
     return;
   }
   position but = path.path[d-1];
-  if (nb <= danger[but.x][but.y]) {
+  if (((nb <= danger[but.x][but.y] || (nb <= path.danger + 30 && danger[but.x][but.y] > 0)) && tour_actuel() < 100) || (tour_actuel() >= 95 && tour_actuel() < 100 && but == artefact)) {
     deplacer(depart, depart, nb);
     return;
   }
+  if (but == artefact)
+    cout << tour_actuel() << endl;
   deplacer(depart, but, nb);
 }
 
@@ -401,6 +407,8 @@ void phase_siege() {
       assieger(smoi[j], tourelles[i].pos, flot[i+1][j+m+1]);
     }
   }
+
+  tact++;
 }
 
 void partie_fin() {}

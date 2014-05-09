@@ -354,11 +354,12 @@ static inline std::vector<int> adversaires()
 ///
 // Retourne le numéro du tour actuel
 //
-extern "C" int api_tour_actuel();
-static inline int tour_actuel()
-{
-  return api_tour_actuel();
-}
+// BUGGED
+//extern "C" int api_tour_actuel();
+//static inline int tour_actuel()
+//{
+//  return api_tour_actuel();
+//}
 
 
 ///
