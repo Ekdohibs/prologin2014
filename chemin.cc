@@ -55,7 +55,7 @@ position file_bfs[4*PORTEE_SORCIER*PORTEE_SORCIER];
 
 vector<position> get_access(position p) {
   for (int x = p.x - PORTEE_SORCIER; x <= p.x + PORTEE_SORCIER; x++) {
-    for (int y = p.y - PORTEE_SORCIER; y <= p.x + PORTEE_SORCIER; y++) {
+    for (int y = p.y - PORTEE_SORCIER; y <= p.y + PORTEE_SORCIER; y++) {
       if (valide(position(x, y))) {
 	vu[x][y] = false;
       }
@@ -81,7 +81,7 @@ vector<position> get_access(position p) {
   
   vector<position> u;
   for (int x = p.x - PORTEE_SORCIER; x <= p.x + PORTEE_SORCIER; x++) {
-    for (int y = p.y - PORTEE_SORCIER; y <= p.x + PORTEE_SORCIER; y++) {
+    for (int y = p.y - PORTEE_SORCIER; y <= p.y + PORTEE_SORCIER; y++) {
       if (valide(position(x, y)) && vu[x][y]) {
 	u.push_back(position(x, y));
       }
