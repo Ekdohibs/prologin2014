@@ -183,10 +183,10 @@ void update_objectives() {
       menace += nb_sorciers_adv(sadv[i]);
     }
     if (distance(sadv[i], base_joueur(moi())) <= 2*PORTEE_SORCIER) {
-      menace += nb_sorciers_adv(sadv[i]);
+      menace2 += nb_sorciers_adv(sadv[i]);
     }
   }
-  if (menace2 < nb_sorciers(base_joueur(moi()), moi()) && menace < nb_sorciers(base_joueur(moi()), moi())/2) {
+  if (menace2 < nb_sorciers(base_joueur(moi()), moi()) && menace < nb_sorciers(base_joueur(moi()), moi())/3) {
     panic = false;
   }
   menace_base = menace;
@@ -258,8 +258,7 @@ void phase_construction() {
     }
   }
   if(panic) {
-    for (int i = 0; i < 2; i++)
-      construire_vers(base_joueur(moi()));
+    while(construire_vers(base_joueur(moi())));
   }
   sort(objectives.begin(), objectives.end());
   for (unsigned int i = 0; i < objectives.size(); i++) {
@@ -275,7 +274,7 @@ void phase_construction() {
       }
     }
   }
-  creer(magie(moi())/COUT_SORCIER);
+  creer(9*magie(moi())/10/COUT_SORCIER);
 }
 
 void phase_deplacement() {
