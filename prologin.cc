@@ -125,9 +125,10 @@ inline bool elimine(int joueur) {
 int jbase(position p) {
   if ((p.x != 0 && p.x != TAILLE_TERRAIN - 1) || (p.y != 0 && p.y != TAILLE_TERRAIN - 1))
     return -1;
-  return (((p.y != 0) << 1) | ((p.y != 0) ^ (p.x != 0))) + 1;
+  return (((p.y != 0) << 1) | ((p.y != 0) ^ (p.x != 0)));
 }
 
+int menace_base = 0;
 void update_objectives() {
   cout << "Objectives\n";
   vector<objective> old_objectives;
@@ -146,6 +147,7 @@ void update_objectives() {
   if (menace2 < nb_sorciers(base_joueur(moi()), moi()) && menace < nb_sorciers(base_joueur(moi()), moi())/2) {
     panic = false;
   }
+  menace_base = menace;
   if (menace > nb_sorciers(base_joueur(moi()), moi())) {
     //objective panic = objective(base_joueur(moi()), 100, 3, 10, 200);
     //panic.tower_s = 3;
@@ -165,7 +167,9 @@ void update_objectives() {
   for (unsigned int i = 0; i < old_objectives.size(); i++) {
     int j = jbase(old_objectives[i].pos);
     if (j != -1) {
+      cout << "Ennemi : " << old_objectives[i].pos.x << " " << old_objectives[i].pos.y << endl;
       if (!elimine(players_ids[j])) {
+	old_objectives[i].sorciers += 5;
 	objectives.push_back(old_objectives[i]);
       }
     } else {
@@ -277,10 +281,14 @@ void phase_deplacement() {
     position p1 = positions[i];
     int ns = nb_sorciers_deplacables(p1, moi());
     if (p1 == base_joueur(moi())) {
-      ns /= 2;
+      ns = max(0, ns - 2*menace_base);
     }
     int dmin = INF;
     int omin = -1;
+    //int dmin = INF;
+    //int omin = -1;
+    if(panic)
+      dmin = 10*distance(p1, base_joueur(moi()))/(150);
     //unsigned int os = min((int)objectives.size(), 4); 
     unsigned int os = objectives.size();
     for (unsigned int j = 0; j < os; j++) {
@@ -289,8 +297,12 @@ void phase_deplacement() {
 	omin = j;
       }
     }
-    if (omin == -1)
+    if (omin == -1) {
+      if (panic) {
+	deplacer(p1, base_joueur(moi()), ns);
+      }
       continue;
+    }
     objectives_sorciers[omin] -= ns;
     deplacer_(p1, objectives[omin].pos, ns);
   }

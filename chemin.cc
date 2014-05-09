@@ -28,6 +28,9 @@ void update_danger() {
       for (unsigned int j = 0; j < pos_atteignables.size(); j++) {
 	position p = pos_atteignables[j];
 	danger[p.x][p.y] += 10;
+	if (distance(p, tourelles[i].pos) > 1) {
+	  danger[p.x][p.y] += 1; // Value cells near turrets more to destroy them
+	}
       }
     }
   }
