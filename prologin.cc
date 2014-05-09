@@ -204,12 +204,17 @@ void update_objectives() {
     return;
   }
  
+  bool found = false;
   for (unsigned int i = 0; i < old_objectives.size(); i++) {
     int j = jbase(old_objectives[i].pos);
     if (j != -1) {
       cout << "Ennemi : " << old_objectives[i].pos.x << " " << old_objectives[i].pos.y << endl;
       if (!elimine(players_ids[j])) {
-	old_objectives[i].sorciers += 5;
+	if (!found) {
+	  old_objectives[i].sorciers += 10;
+	}
+	found = true;
+	//old_objectives[i].sorciers += 5;
 	objectives.push_back(old_objectives[i]);
       }
     } else {
