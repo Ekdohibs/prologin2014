@@ -7,6 +7,7 @@
 #include "max_flow.hh"
 #include "chemin.hh"
 #include "common.hh"
+#include <time.h>
 using namespace std;
 
 #define INF 10000000
@@ -227,7 +228,8 @@ position autour_artefact[4] = {position(TAILLE_TERRAIN/2 - 1, TAILLE_TERRAIN/2),
 			       position(TAILLE_TERRAIN/2 + 1, TAILLE_TERRAIN/2),
 			       position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2 - 1),
 			       position(TAILLE_TERRAIN/2, TAILLE_TERRAIN/2 + 1)};
-void phase_construction() {
+
+void phase_construction_() {
   update_objectives();
   if (tour_actuel() == 1) {
     creer(magie(moi())/COUT_SORCIER);
@@ -284,7 +286,14 @@ void phase_construction() {
   creer(9*magie(moi())/10/COUT_SORCIER);
 }
 
-void phase_deplacement() {
+void phase_construction() {
+  clock_t t = clock();
+  phase_construction_();
+  t = clock() - t;
+  cout << moi() << " phase_constuction : " << ((float)t)/CLOCKS_PER_SEC << "s\n"; 
+}
+
+void phase_deplacement_() {
   update_danger();
   cout << "Deplacement\n";
   vector<position> positions = sorciers(moi());
@@ -384,7 +393,14 @@ void phase_deplacement() {
   //}
 }
 
-void phase_tirs() {
+void phase_deplacement() {
+  clock_t t = clock();
+  phase_deplacement_();
+  t = clock() - t;
+  cout << moi() << " phase_deplacements : " << ((float)t)/CLOCKS_PER_SEC << "s\n"; 
+}
+
+void phase_tirs_() {
   vector<tourelle> tourelles = tourelles_joueur(moi());
   vector<position> sadv = sorciers_adv();
   int n = tourelles.size() + sadv.size() + 2;
@@ -417,7 +433,14 @@ void phase_tirs() {
   }
 }
 
-void phase_siege() {
+void phase_tirs() {
+  clock_t t = clock();
+  phase_tirs_();
+  t = clock() - t;
+  cout << moi() << " phase_tirs : " << ((float)t)/CLOCKS_PER_SEC << "s\n"; 
+}
+
+void phase_siege_() {
   vector<tourelle> tourelles = tourelles_adv();
   vector<position> smoi = sorciers(moi());
   int n = tourelles.size() + smoi.size() + 2;
@@ -451,6 +474,13 @@ void phase_siege() {
   //}
 
   tact++;
+}
+
+void phase_siege() {
+  clock_t t = clock();
+  phase_siege_();
+  t = clock() - t;
+  cout << moi() << " phase_siege : " << ((float)t)/CLOCKS_PER_SEC << "s\n"; 
 }
 
 void partie_fin() {}
