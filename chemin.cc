@@ -50,19 +50,47 @@ struct cle {
 
 position deps[4] = {position(0, 1), position(0, -1), position(1, 0), position(-1, 0)};
 
-position pres[TAILLE_TERRAIN][TAILLE_TERRAIN];
+bool vu[TAILLE_TERRAIN][TAILLE_TERRAIN];
+position file_bfs[4*PORTEE_SORCIER*PORTEE_SORCIER];
 
 vector<position> get_access(position p) {
-  vector<position> u = pos_in_range(p, PORTEE_SORCIER);
-  vector<position> v;
-  for (unsigned int i = 0; i < u.size(); i++) {
-    if (chemin(p, u[i]).size() <= PORTEE_SORCIER) {
-      v.push_back(u[i]);
+  for (int x = p.x - PORTEE_SORCIER; x <= p.x + PORTEE_SORCIER; x++) {
+    for (int y = p.y - PORTEE_SORCIER; y <= p.x + PORTEE_SORCIER; y++) {
+      if (valide(position(x, y))) {
+	vu[x][y] = false;
+      }
     }
   }
-  return v;
+  file_bfs[0] = p;
+  int index = 0;
+  int indexchange = 1;
+  int indexadd = 1;
+  for (int i = 0; i < PORTEE_SORCIER; i++) {
+      while (index < indexchange) {
+	position u = file_bfs[index++];
+	for (int k = 0; k < 4; k++) {
+	  position v = u + deps[k];
+	  if (valide(v) && info_case(v) != CASE_TOURELLE && !vu[v.x][v.y]) {
+	    vu[v.x][v.y] = true;
+	    file_bfs[indexadd++] = v;
+	  }
+	}
+      }
+      indexchange = indexadd;
+  }
+  
+  vector<position> u;
+  for (int x = p.x - PORTEE_SORCIER; x <= p.x + PORTEE_SORCIER; x++) {
+    for (int y = p.y - PORTEE_SORCIER; y <= p.x + PORTEE_SORCIER; y++) {
+      if (valide(position(x, y)) && vu[x][y]) {
+	u.push_back(position(x, y));
+      }
+    }
+  }
+  return u;
 }
 
+position pres[TAILLE_TERRAIN][TAILLE_TERRAIN];
 safe_path safe_chemin(position depart, position arrivee) {
   priority_queue<cle> tas;
   for (int i = 0; i < TAILLE_TERRAIN; i++) {

@@ -32,10 +32,13 @@ struct objective {
   int value;
   int tower_delay;
   int tower_s;
+  int tower_increase_delay;
+  int tower_increase_s;
 
   objective() {};
-  objective(position pos_, int value_, int tower_delay_):
-    pos(pos_), value(value_), tower_delay(tower_delay_), tower_s(0) {};
+  objective(position pos_, int value_, int tower_delay_, int tower_increase_delay_):
+    pos(pos_), value(value_), tower_delay(tower_delay_), tower_s(0),
+    tower_increase_delay(tower_increase_delay_), tower_increase_s(0) {};
 
   inline bool operator < (const objective &other) const {
     return value > other.value;

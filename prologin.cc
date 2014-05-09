@@ -24,8 +24,8 @@ void deplacer_(position depart, position arrivee, int nb) {
     return;
   }
   safe_path path = safe_chemin(depart, arrivee);
-  if (nb <= path.danger)
-    return;
+  //if (nb <= path.danger)
+  //  return;
   //dump_path(path);
   //int d = min((int)path.size(), PORTEE_SORCIER);
   int d = min((int)path.path.size(), 1);
@@ -114,7 +114,7 @@ void update_objectives() {
     }
   }
   if (menace > nb_sorciers(base_joueur(moi()), moi())) {
-    objective panic = objective(base_joueur(moi()), 5, 3);
+    objective panic = objective(base_joueur(moi()), 5, 3, 10);
     panic.tower_s = 3;
     objectives.push_back(panic);
     cout << "Panic mode\n";
@@ -126,6 +126,7 @@ void update_objectives() {
 	objectives.push_back(old_objectives[i]);
       }
     } else {
+      objectives.push_back(old_objectives[i]);
     }
   }
 }
@@ -137,10 +138,15 @@ void phase_construction() {
   }
   sort(objectives.begin(), objectives.end());
   for (unsigned int i = 0; i < objectives.size(); i++) {
-    objectives[i].tower_s += 1;
+    objectives[i].tower_s++;
     if (objectives[i].tower_s >= objectives[i].tower_delay) {
       if (construire_vers(objectives[i].pos)) {
 	objectives[i].tower_s = 0;
+	objectives[i].tower_increase_s++;
+	if (objectives[i].tower_increase_s >= objectives[i].tower_increase_delay) {
+	    objectives[i].tower_increase_s = 0;
+	    objectives[i].tower_delay++;
+	}
       }
     }
   }

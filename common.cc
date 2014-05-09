@@ -26,11 +26,11 @@ void partie_debut() {
     fontaines[i] = mid(base_joueur(players_ids[i]), 
 		       base_joueur(players_ids[(i+1)%4]));
   }
-  //objectives.push_back(objective(artefact, 3, 1));
+  objectives.push_back(objective(artefact, 3, 1, 2));
   //objectives.push_back(objective(fontaines[0], 1, 2));
-  objectives.push_back(objective(base_joueur(players_ids[1]), 1, 2));;
-  objectives.push_back(objective(base_joueur(players_ids[3]), 1, 2));;
-  objectives.push_back(objective(base_joueur(players_ids[2]), 1, 2));;
+  objectives.push_back(objective(base_joueur(players_ids[1]), 1, 2, 3));;
+  objectives.push_back(objective(base_joueur(players_ids[3]), 1, 2, 3));;
+  objectives.push_back(objective(base_joueur(players_ids[2]), 1, 2, 3));;
   //objectives.push_back(objective(fontaines[3], 1, 2));
 }
 
