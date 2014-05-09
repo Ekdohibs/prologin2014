@@ -153,6 +153,15 @@ void update_objectives() {
     panic = true;
     cout << "Panic mode\n";
   }
+  if (tour_actuel() >= 92) {
+    objectives.push_back(objective(artefact, 10, 1, 2, 100000));
+    objectives.push_back(objective(fontaines[0], 5, 1000000, 1, 1));
+    objectives.push_back(objective(fontaines[3], 5, 1000000, 1, 1));
+    objectives.push_back(objective(fontaines[1], 5, 1000000, 1, 1));
+    objectives.push_back(objective(fontaines[2], 5, 1000000, 1, 1));
+    return;
+  }
+ 
   for (unsigned int i = 0; i < old_objectives.size(); i++) {
     int j = jbase(old_objectives[i].pos);
     if (j != -1) {
@@ -235,7 +244,7 @@ void phase_deplacement() {
   for (unsigned int i = 0; i < objectives.size(); i++) {
     objectives_sorciers.push_back(objectives[i].sorciers);
   }
-  while (1) {
+  /*while (1) {
     int smax = 0;
     int imax = -1;
     for (unsigned int i = 0; i < objectives.size(); i++) {
@@ -251,8 +260,8 @@ void phase_deplacement() {
     int omin = -1;
     for (unsigned int i = 0; i < positions.size(); i++) {
       int ns = nb_sorciers_deplacables(positions[i], moi());
-      if ((ns > 0) && (distance(positions[i], objectives[imax].pos) < dmin)) {
-	dmin = distance(positions[i], objectives[imax].pos);
+      if ((ns > 0) && ((10*distance(positions[i], objectives[imax].pos)/objectives[imax].value) < dmin)) {
+	dmin = 10*distance(positions[i], objectives[imax].pos)/objectives[imax].value;
 	omin = i;
       }
     }
@@ -263,8 +272,8 @@ void phase_deplacement() {
     objectives_sorciers[imax] -= ns;
     deplacer_(positions[omin], objectives[imax].pos, ns);
     
-  }
-  /*for (unsigned int i = 0; i < positions.size(); i++) {
+    }*/
+  for (unsigned int i = 0; i < positions.size(); i++) {
     position p1 = positions[i];
     int ns = nb_sorciers_deplacables(p1, moi());
     if (p1 == base_joueur(moi())) {
@@ -272,17 +281,19 @@ void phase_deplacement() {
     }
     int dmin = INF;
     int omin = -1;
-    unsigned int os = min((int)objectives.size(), 4); 
+    //unsigned int os = min((int)objectives.size(), 4); 
+    unsigned int os = objectives.size();
     for (unsigned int j = 0; j < os; j++) {
-      if (distance(p1, objectives[j].pos) < dmin && objectives_sorciers[j] > 0) {
-	dmin = distance(p1, objectives[j].pos);
+      if ((10*distance(p1, objectives[j].pos))/objectives[j].value < dmin && objectives_sorciers[j] > 0) {
+	dmin = (10*distance(p1, objectives[j].pos))/objectives[j].value;
 	omin = j;
       }
     }
     if (omin == -1)
       continue;
     objectives_sorciers[omin] -= ns;
-    deplacer_(p1, objectives[omin].pos, ns);*/
+    deplacer_(p1, objectives[omin].pos, ns);
+  }
     //vector<unsigned int> objs;
     //if (p1 == base_joueur(moi())) {
     //  for (unsigned int i = 0; i < objectives.size(); i++) {
@@ -300,7 +311,7 @@ void phase_deplacement() {
 	  objs.push_back(i);
 	}
       }
-    }*/
+      }*/
     //int s = 0;
     //for (unsigned int i = 0; i < objs.size(); i++) {
     //  s += objectives[objs[i]].value;
