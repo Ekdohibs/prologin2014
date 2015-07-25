@@ -10,6 +10,53 @@
 #include <time.h>
 using namespace std;
 
+/*
++------------------------------+
+|  Fonctionnement du champion  |
++------------------------------+
+
+Fonctionnement global, idée générale : 
+--------------------------------------
+
+On a une liste d'objectifs, qu'on veut attaquer/défendre
+(artefact, fontaines, ennemis, etc).
+A la fin de la partie, on envoie autant d'unités que possible
+sur l'artefact (sauf en cas de menace de la base)
+
+
+Phase I - Construction
+----------------------
+
+On met a jour la liste des objectifs.
+On construit des suites de tours pour s'approcher des objectifs :
+on choisit l'emplacement le plus proche possible constructible.
+Si on est attaque, on essaie de se barricader derrière les tours.
+On finit par construire des sorciers.
+
+Phase II - Deplacement
+----------------------
+
+Phase la plus bugguee... un essai d'utilisation de max_flow_min_cout
+s'est solde par un échec cuisant, par conséquent on utilise un 
+algorithme glouton assez stupide. On cherche des chemins les moins 
+dangereux possibles, et parmi ceux-là, les plus courts. Pour essayer
+de s'approcher des tours ennemies, on les cases a cote de celles-ci
+un peu moins dangereuse que le reste de leur zone d'attaque. On evite
+egalement d'envoyer des sorciers au suicide.
+
+Phase III - Tir
+---------------
+
+Simple application d'un algorithme de max_flow pour trouver un couplage
+maximal. L'algorithme utilise est Ford-Fulkerson.
+
+Phase IV - Siege
+----------------
+
+Idem Phase III.
+
+*/
+
 #define INF 10000000
 
 bool panic = false;
